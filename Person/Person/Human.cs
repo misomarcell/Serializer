@@ -26,6 +26,8 @@ namespace Person
             serial = Settings.Default.LastSerial + 1;
             Settings.Default.LastSerial = serial;
             Settings.Default.Save();
+
+            Serialize();
         }
 
         public static Human Deserialize(int serial = -1)
@@ -58,20 +60,6 @@ namespace Person
 
             return human;
         }
-
-        private static string SearchForPerson()
-        {
-            for (int i = 0; i < 100; i++) //Check for the first file to open
-            {
-                if (File.Exists(Directory.GetCurrentDirectory() + "\\Person" + i + ".dat"))
-                {
-                    return "Person" + i + ".dat";
-                }
-            }
-
-            return String.Empty;
-        }
-
         public void Serialize()
         {
             string fileName = "Person" + serial + ".dat";
@@ -87,9 +75,26 @@ namespace Person
             fs.Close();
         }
 
+        /// <summary>
+        /// Returns the name of the first existing Person.dat file in the working directory, otherwise String.Empty
+        /// </summary>
+        private static string SearchForPerson()
+        {
+            for (int i = 0; i < 100; i++) //Check for the first file to open
+            {
+                if (File.Exists(Directory.GetCurrentDirectory() + "\\Person" + i + ".dat"))
+                {
+                    return "Person" + i + ".dat";
+                }
+            }
+
+            return String.Empty;
+        }
+
+
         public void OnDeserialization(object sender)
         {
-            
+            //I have no idea how to get the serial number with this.
         }
     }
 }

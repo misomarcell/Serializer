@@ -1,6 +1,4 @@
-﻿using Person.Properties;
-using System;
-using System.Diagnostics;
+﻿using System;
 using System.IO;
 using System.Windows.Forms;
 
@@ -18,7 +16,6 @@ namespace Person
         private void button1_Click(object sender, EventArgs e)
         {
             human = new Human(txtName.Text, txtAddress.Text, txtPhone.Text);
-            human.Serialize();
         }
 
         private void LoadHumanData()
@@ -28,8 +25,6 @@ namespace Person
                 txtName.Text = human.name;
                 txtAddress.Text = human.address;
                 txtPhone.Text = human.phone.ToString();
-
-                Debug.WriteLine("SERIAL: " + human.serial);
             }
         }
 
@@ -38,7 +33,6 @@ namespace Person
             human = Human.Deserialize();
             LoadHumanData();         
         }
-
 
         private void GetNextHuman(object sender, EventArgs e)
         {
@@ -49,16 +43,9 @@ namespace Person
 
             for (int i = human.serial + 1; i < 100; i++)
             {
-                if ( File.Exists(Directory.GetCurrentDirectory() + "\\Person" + i + ".dat") )
+                if ( AttemptLoad(i) )
                 {
-                    Debug.WriteLine("FILE FOUND AT SERIAL #" + i);
-                    Human h = Human.Deserialize(i);
-                    if (h != null)
-                    {
-                        human = h;
-                        LoadHumanData();
-                        break;
-                    }
+                    break;
                 }
             }
         }
@@ -72,18 +59,29 @@ namespace Person
 
             for (int i = human.serial - 1; i > 0; i--)
             {
-                if (File.Exists(Directory.GetCurrentDirectory() + "\\Person" + i + ".dat"))
+                if ( AttemptLoad(i) )
                 {
-                    Debug.WriteLine("FILE FOUND AT SERIAL #" + i);
-                    Human h = Human.Deserialize(i);
-                    if (h != null)
-                    {
-                        human = h;
-                        LoadHumanData();
-                        break;
-                    }
+                    break;
                 }
             }
+        }
+
+        /// <summary>
+        /// Returns true if the person with the given serial exist and can be loaded, otherwise false.
+        /// </summary>
+        private Boolean AttemptLoad(int serial)
+        {
+            if (File.Exists(Directory.GetCurrentDirectory() + "\\Person" + serial + ".dat"))
+            {
+                Human h = Human.Deserialize(serial);
+                if (h != null)
+                {
+                    human = h;
+                    LoadHumanData();
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }
